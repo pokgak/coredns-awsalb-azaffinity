@@ -1,6 +1,6 @@
 module github.com/pokgak/coredns-plugin-awsalb-azaffinity
 
-go 1.18
+go 1.23
 
 require (
 	github.com/coredns/caddy v1.1.0
