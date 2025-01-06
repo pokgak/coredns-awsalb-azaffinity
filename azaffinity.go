@@ -18,7 +18,7 @@ type AZAffinity struct {
 	SubnetAZMap map[string]string
 }
 
-var internalAwsAlbDnsPattern = regexp.MustCompile(`^internal-k8s-[a-z0-9-]+-[a-z0-9]+-[0-9]+\.ap-southeast-1.elb\.amazonaws\.com$`)
+var internalAwsAlbDnsPattern = regexp.MustCompile(`^internal-k8s-.*\.ap-southeast-1.elb\.amazonaws\.com$`)
 
 func init() {
 	caddy.RegisterPlugin("azaffinity", caddy.Plugin{
@@ -68,12 +68,11 @@ func (a AZAffinity) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.M
 	}
 
 	for _, question := range r.Question {
-		// Combine the if condition check for CNAME and regex MatchString
-		if question.Qtype != dns.TypeCNAME || !internalAwsAlbDnsPattern.MatchString(question.Name) {
+		if !internalAwsAlbDnsPattern.MatchString(question.Name) {
 			continue
 		}
 
-		// Append the availability zone to the CNAME
+		// Append the availability zone to the record
 		question.Name = az + "." + question.Name
 	}
 
