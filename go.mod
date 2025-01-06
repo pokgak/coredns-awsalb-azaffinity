@@ -1,4 +1,4 @@
-module github.com/pokgak/coredns-plugin-awsalb-azaffinity
+module github.com/pokgak/coredns-awsalb-azaffinity
 
 go 1.23
 
