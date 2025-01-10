@@ -9,6 +9,7 @@ import (
 	"github.com/coredns/caddy"
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
+	"github.com/coredns/coredns/plugin/pkg/log"
 	"github.com/coredns/coredns/request"
 	"github.com/miekg/dns"
 )
@@ -69,11 +70,16 @@ func (a AZAffinity) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.M
 
 	for _, question := range r.Question {
 		if !internalAwsAlbDnsPattern.MatchString(question.Name) {
+			log.Debug("Skipping question", "name", question.Name)
 			continue
 		}
 
+		log.Debug("Processing question", "name", question.Name)
+
 		// Append the availability zone to the record
 		question.Name = az + "." + question.Name
+
+		log.Debug("Updated question", "name", question.Name)
 	}
 
 	return plugin.NextOrFailure(a.Name(), a.Next, ctx, w, r)
